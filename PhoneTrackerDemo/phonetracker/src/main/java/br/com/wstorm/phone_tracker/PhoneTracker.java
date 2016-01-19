@@ -16,13 +16,15 @@ public class PhoneTracker implements SensorEventListener{
 
     private static PhoneTracker instance;
 
+    private PhoneTrackListener listener;
+
     private static SensorManager sensorManager;
 
     public static SensorManager getSensorManager() {
         return sensorManager;
     }
 
-    public static PhoneTracker init(Context context) {
+    public static PhoneTracker init(Context context, PhoneTrackListener listener) {
 
 
         if (instance == null) {
@@ -30,6 +32,7 @@ public class PhoneTracker implements SensorEventListener{
             instance = new PhoneTracker();
             sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
             instance.registerListeners();
+            instance.listener = listener;
 
         }
 
@@ -37,7 +40,7 @@ public class PhoneTracker implements SensorEventListener{
 
     }
 
-    public void stop(Context context) {
+    public void stop() {
 
 
         if (instance != null && sensorManager != null) {
@@ -141,9 +144,49 @@ public class PhoneTracker implements SensorEventListener{
 
     // ==========================================================================
 
+    // Proximity Section ========================================================
+
+    public boolean hasGravitySensor() {
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null){
+            return true;
+        }
+
+        return false;
+
+    }
+
+    // ==========================================================================
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.d("PhoneTracker", String.format("Sensor: %s - Value: %s", event.sensor.getName(), event.values));
+
+        switch (event.sensor.getType()) {
+
+            case Sensor.TYPE_ACCELEROMETER:
+                listener.accelerometerValueChanged(event);
+                break;
+
+            case Sensor.TYPE_GYROSCOPE:
+                listener.gyroscopeValueChanged(event);
+                break;
+
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                listener.magnetometerValueChanged(event);
+                break;
+
+            case Sensor.TYPE_PROXIMITY:
+                listener.proximityValueChanged(event);
+                break;
+
+            case Sensor.TYPE_GRAVITY:
+                listener.gravityValueChanged(event);
+                break;
+
+        }
+
+
+        Log.d("PhoneTracker", String.format("Sensor: %s - Value: %s", event.sensor.getName(), event.values[0]));
     }
 
     @Override
