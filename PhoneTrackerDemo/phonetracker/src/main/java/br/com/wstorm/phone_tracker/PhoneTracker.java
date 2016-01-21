@@ -185,7 +185,6 @@ public class PhoneTracker implements SensorEventListener{
 
         }
 
-
         Log.d("PhoneTracker", String.format("Sensor: %s - Value: %s", event.sensor.getName(), event.values[0]));
     }
 

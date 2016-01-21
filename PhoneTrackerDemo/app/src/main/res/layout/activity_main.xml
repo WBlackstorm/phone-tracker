@@ -46,4 +46,16 @@
         android:layout_height="wrap_content"
         android:text="" />
 
+    <TextView
+        android:id="@+id/txt_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Latitude: 0.0" />
+
+    <TextView
+        android:id="@+id/txt_longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Longitude: 0.0" />
+
 </LinearLayout>
