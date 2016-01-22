@@ -8,11 +8,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.location.LocationRequest;
 
-import br.com.wstorm.phone_tracker.PhoneTrackListener;
+import br.com.wstorm.phone_tracker.PhoneTrackerListener;
 import br.com.wstorm.phone_tracker.PhoneTracker;
 import br.com.wstorm.phone_tracker.PhoneTrackerGeoLocation;
 
-public class MainActivity extends AppCompatActivity implements PhoneTrackListener, PhoneTrackerGeoLocation.PhoneTrackerLocationListener {
+public class MainActivity extends AppCompatActivity implements PhoneTrackerListener, PhoneTrackerGeoLocation.PhoneTrackerLocationListener {
 
     private PhoneTracker tracker;
     private PhoneTrackerGeoLocation phoneTrackerGeoLocation;
@@ -53,11 +53,9 @@ public class MainActivity extends AppCompatActivity implements PhoneTrackListene
 
         Log.d("MainActivity - Tracker", tracker.getSensorList().toString());
 
-        textView.setText(String.format("Magnetic: %b\nAcelerometer: %b\nGyroscope: %b\nProximity: %b\nGravity: %b",
+        textView.setText(String.format("Magnetic: %b\nAcelerometer: %b\nGravity: %b",
                 tracker.hasMagneticSensor(),
                 tracker.hasAcelerometerSensor(),
-                tracker.hasGyroscopeSensor(),
-                tracker.hasProximitySensor(),
                 tracker.hasGravitySensor()));
     }
 
@@ -76,27 +74,23 @@ public class MainActivity extends AppCompatActivity implements PhoneTrackListene
 
     @Override
     public void accelerometerValueChanged(SensorEvent event) {
-        textView1.setText("Accelerometer: " + String.valueOf(event.values[0]));
+        textView1.setText(String.format("Accelerometer: \nX: %f, Y: %f, Z: %f", event.values[0], event.values[1], event.values[2]));
     }
 
     @Override
     public void magnetometerValueChanged(SensorEvent event) {
-        textView2.setText("Magnetometer: " + String.valueOf(event.values[0]));
-    }
-
-    @Override
-    public void gyroscopeValueChanged(SensorEvent event) {
-        textView3.setText("Gyroscope: " + String.valueOf(event.values[0]));
-    }
-
-    @Override
-    public void proximityValueChanged(SensorEvent event) {
-        textView4.setText("Proximity: " + String.valueOf(event.values[0]));
+        textView2.setText(String.format("Magnetometer: \nX: %f, Y: %f, Z: %f", event.values[0], event.values[1], event.values[2]));
     }
 
     @Override
     public void gravityValueChanged(SensorEvent event) {
-        textView5.setText("Gravity: " + String.valueOf(event.values[0]));
+        textView5.setText(String.format("Gravity: \nX: %f, Y: %f, Z: %f", event.values[0], event.values[1], event.values[2]));
+
+    }
+
+    @Override
+    public void azimuthCalculated(int value) {
+        textView4.setText(String.format("Azimuth: %d", value));
     }
 
     @Override

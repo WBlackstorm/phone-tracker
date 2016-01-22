@@ -5,16 +5,14 @@ import android.hardware.SensorEvent;
 /**
  * Created by wstorm on 1/19/16.
  */
-public interface PhoneTrackListener {
+public interface PhoneTrackerListener {
 
     void accelerometerValueChanged(SensorEvent event);
 
     void magnetometerValueChanged(SensorEvent event);
 
-    void gyroscopeValueChanged(SensorEvent event);
-
-    void proximityValueChanged(SensorEvent event);
-
     void gravityValueChanged(SensorEvent event);
+
+    void azimuthCalculated(int value);
 
 }

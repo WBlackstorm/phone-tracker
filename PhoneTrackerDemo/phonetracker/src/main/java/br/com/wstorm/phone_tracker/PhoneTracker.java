@@ -5,7 +5,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.List;
 
@@ -16,7 +15,14 @@ public class PhoneTracker implements SensorEventListener{
 
     private static PhoneTracker instance;
 
-    private PhoneTrackListener listener;
+    private PhoneTrackerListener listener;
+
+    private int mAzimuth = 0;
+    private float[] gData = new float[3]; // accelerometer
+    private float[] mData = new float[3]; // magnetometer
+    private float[] rMat = new float[9];
+    private float[] iMat = new float[9];
+    private float[] orientation = new float[3];
 
     private static SensorManager sensorManager;
 
@@ -24,7 +30,7 @@ public class PhoneTracker implements SensorEventListener{
         return sensorManager;
     }
 
-    public static PhoneTracker init(Context context, PhoneTrackListener listener) {
+    public static PhoneTracker init(Context context, PhoneTrackerListener listener) {
 
 
         if (instance == null) {
@@ -66,7 +72,7 @@ public class PhoneTracker implements SensorEventListener{
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
     }
@@ -91,9 +97,6 @@ public class PhoneTracker implements SensorEventListener{
 
     }
 
-
-
-
     // ==========================================================================
 
     // Acelerometer Section =========================================================
@@ -108,47 +111,13 @@ public class PhoneTracker implements SensorEventListener{
 
     }
 
-
-
-
     // ==========================================================================
 
-    // Gyroscope Section ========================================================
-
-    public boolean hasGyroscopeSensor() {
-
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null){
-            return true;
-        }
-
-        return false;
-
-    }
-
-
-
-
-    // ==========================================================================
-
-    // Proximity Section ========================================================
-
-    public boolean hasProximitySensor() {
-
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null){
-            return true;
-        }
-
-        return false;
-
-    }
-
-    // ==========================================================================
-
-    // Proximity Section ========================================================
+    // Gravity Section ========================================================
 
     public boolean hasGravitySensor() {
 
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY) != null){
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null){
             return true;
         }
 
@@ -167,25 +136,25 @@ public class PhoneTracker implements SensorEventListener{
                 listener.accelerometerValueChanged(event);
                 break;
 
-            case Sensor.TYPE_GYROSCOPE:
-                listener.gyroscopeValueChanged(event);
-                break;
-
             case Sensor.TYPE_MAGNETIC_FIELD:
+                mData = event.values.clone();
                 listener.magnetometerValueChanged(event);
                 break;
 
-            case Sensor.TYPE_PROXIMITY:
-                listener.proximityValueChanged(event);
-                break;
-
             case Sensor.TYPE_GRAVITY:
+                gData = event.values.clone();
                 listener.gravityValueChanged(event);
                 break;
 
+            default: return;
+
         }
 
-        Log.d("PhoneTracker", String.format("Sensor: %s - Value: %s", event.sensor.getName(), event.values[0]));
+        if ( SensorManager.getRotationMatrix( rMat, iMat, gData, mData ) ) {
+            mAzimuth= (int) ( Math.toDegrees( SensorManager.getOrientation( rMat, orientation )[0] ) + 360 ) % 360;
+            listener.azimuthCalculated(mAzimuth);
+        }
+
     }
 
     @Override
